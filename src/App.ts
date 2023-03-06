@@ -6,7 +6,6 @@ import axiosRetry from 'axios-retry';
 import path from 'path';
 
 import moment from 'moment';
-import 'moment/locale/ru';
 
 import { AppConfig } from './AppConfig';
 import { AppRunner } from './AppRunner';
