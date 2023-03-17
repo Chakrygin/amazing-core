@@ -79,7 +79,7 @@ function getMessage(post: Post): string {
   }
 
   if (post.author) {
-    line.push(post.author);
+    line.push(encode(post.author));
   }
 
   line.push(post.date.format('LL'));
@@ -93,7 +93,7 @@ function getMessage(post: Post): string {
 
   if (post.links && post.links.length > 0) {
     const links = post.links
-      .map(link => `${link.title}: ${link.href}`);
+      .map(link => `${encode(link.title)}: ${link.href}`);
 
     lines.push(...links);
   }
@@ -110,7 +110,7 @@ function getMessage(post: Post): string {
 }
 
 function link(link: Link): string {
-  return `<a href="${link.href}">${link.title}</a>`;
+  return `<a href="${link.href}">${encode(link.title)}</a>`;
 }
 
 function bold(text: string): string {
