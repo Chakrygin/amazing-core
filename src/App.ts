@@ -5,13 +5,16 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import path from 'path';
 
-import moment from 'moment';
-
 import { AppConfig } from './AppConfig';
 import { AppRunner } from './AppRunner';
 
 import { createReporter, createSender, getInput, getKnownHosts } from './helpers';
 import { Scraper } from './scrapers';
+
+// Setup default axios retries.
+axiosRetry(axios, {
+  retryDelay: retryNumber => axiosRetry.exponentialDelay(retryNumber),
+});
 
 export class App {
   constructor(
@@ -19,14 +22,6 @@ export class App {
 
   async run(): Promise<void> {
     try {
-
-      // Setup default moment locale.
-      moment.locale('en');
-
-      // Setup default axios retries.
-      axiosRetry(axios, {
-        retryDelay: retryNumber => axiosRetry.exponentialDelay(retryNumber),
-      });
 
       const TELEGRAM_TOKEN = getInput('TELEGRAM_TOKEN');
       const TELEGRAM_PUBLIC_CHAT_ID = getInput('TELEGRAM_PUBLIC_CHAT_ID');
