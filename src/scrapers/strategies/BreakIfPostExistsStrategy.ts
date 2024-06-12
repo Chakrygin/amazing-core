@@ -11,7 +11,7 @@ import { Storage } from '../../storages';
 export class BreakIfPostExistsStrategy implements Strategy {
   constructor(
     private readonly fetchPosts: () => AsyncGenerator<Post>,
-    private readonly enrichPost: (post: Post) => Promise<Post | null>) { }
+    private readonly enrichPost: (post: Post) => Promise<Post | undefined>) { }
 
   async scrape(sender: Sender, storage: Storage): Promise<void> {
     let firstPostDate: moment.Moment | undefined;

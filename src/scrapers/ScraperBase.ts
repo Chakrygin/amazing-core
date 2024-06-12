@@ -44,7 +44,7 @@ export abstract class ScraperBase implements Scraper {
 
   protected abstract fetchPosts(): AsyncGenerator<Post>;
 
-  protected enrichPost(post: Post): Promise<Post | null> {
+  protected enrichPost(post: Post): Promise<Post | undefined> {
     return Promise.resolve(post);
   }
 

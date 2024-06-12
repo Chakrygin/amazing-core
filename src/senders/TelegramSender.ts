@@ -100,7 +100,7 @@ export class TelegramSender implements Sender {
       lines.push(...links);
     }
     else {
-      lines.push(post.href);
+      lines.push(bold(post.href));
     }
 
     if (post.tags && post.tags.length > 0) {

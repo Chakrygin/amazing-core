@@ -21,8 +21,6 @@ export class RssFeedHelper<TFeed, TItem> {
       throw new Error('Failed to parse rss feed. No posts found.');
     }
 
-    core.info(`Posts found: ${feed.items.length}.`);
-
     for (let index = 0; index < feed.items.length; index++) {
       core.info(`Parsing post at index ${index}...`);
 
