@@ -1,56 +1,33 @@
 import { Sender } from './Sender';
-import { Post, Link } from '../posts';
+import { Post } from '../models';
 
 export class NormalizeSender implements Sender {
   constructor(
     private readonly sender: Sender) { }
 
-  async send(post: Post, debug: boolean): Promise<void> {
-
+  async send(post: Post): Promise<void> {
     post = {
       image: post.image?.trim(),
       title: post.title.trim(),
       href: post.href.trim(),
-      categories: normalizeCategories(post.categories),
+      categories: post.categories
+        .map(category => ({
+          title: category.title.trim(),
+          href: category.href.trim(),
+        })),
       author: post.author?.trim(),
       date: post.date,
       description: post.description,
-      links: normalizeLinks(post.links),
-      tags: normalizeTags(post.tags),
+      links: post.links
+        ?.map(link => ({
+          title: link.title.trim(),
+          href: link.href.trim(),
+        })),
+      tags: post.tags
+        ?.map(tag => tag.trim())
+        .sort(),
     };
 
-    await this.sender.send(post, debug);
+    await this.sender.send(post);
   }
-}
-
-function normalizeCategories(categories: Link[]): Link[] {
-  if (categories.length > 0) {
-    categories = categories.map(category => ({
-      title: category.title.trim(),
-      href: category.href.trim(),
-    }));
-  }
-
-  return categories;
-}
-
-function normalizeLinks(links: Link[] | undefined): Link[] | undefined {
-  if (links && links.length > 0) {
-    links = links.map(link => ({
-      title: link.title.trim(),
-      href: link.href.trim(),
-    }));
-  }
-
-  return links;
-}
-
-function normalizeTags(tags: string[] | undefined): string[] | undefined {
-  if (tags && tags.length > 0) {
-    tags = tags
-      .map(tag => tag.trim())
-      .sort();
-  }
-
-  return tags;
 }

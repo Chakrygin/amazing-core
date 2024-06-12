@@ -1,3 +1,4 @@
+export * from './createSender';
 export * from './NormalizeSender';
 export * from './Sender';
 export * from './TelegramSender';

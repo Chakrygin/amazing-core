@@ -3,45 +3,49 @@ import * as github from '@actions/github';
 
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+import moment from 'moment';
 import path from 'path';
+
+import 'moment/locale/ru.js';
 
 import { AppConfig } from './AppConfig';
 import { AppRunner } from './AppRunner';
 
-import { createReporter, createSender, getInput, getKnownHosts } from './helpers';
 import { Scraper } from './scrapers';
-
-// Setup default axios retries.
-axiosRetry(axios, {
-  retryDelay: retryNumber => axiosRetry.exponentialDelay(retryNumber),
-});
+import { createSender } from './senders';
+import { getInput, getKnownHosts } from './utils';
 
 export class App {
   constructor(
-    private readonly createScrapers: (knownHosts: string[]) => readonly Scraper[]) { }
+    private readonly createScrapers: (knownHosts: readonly string[]) => readonly Scraper[]) { }
 
   async run(): Promise<void> {
     try {
 
-      const TELEGRAM_TOKEN = getInput('TELEGRAM_TOKEN');
+      // Setup default axios retries.
+      axiosRetry(axios, {
+        retryDelay: retryNumber => axiosRetry.exponentialDelay(retryNumber),
+      });
+
+      // Setup default moment locale.
+      moment.locale('en');
+
+      const TELEGRAM_PUBLIC_TOKEN = getInput('TELEGRAM_PUBLIC_TOKEN');
       const TELEGRAM_PUBLIC_CHAT_ID = getInput('TELEGRAM_PUBLIC_CHAT_ID');
+
+      const TELEGRAM_PRIVATE_TOKEN = getInput('TELEGRAM_PRIVATE_TOKEN');
       const TELEGRAM_PRIVATE_CHAT_ID = getInput('TELEGRAM_PRIVATE_CHAT_ID');
 
       const config = this.createConfig();
       const knownHosts = getKnownHosts(config.path);
       const scrapers = this.createScrapers(knownHosts);
-      const sender = createSender(TELEGRAM_TOKEN, TELEGRAM_PUBLIC_CHAT_ID, TELEGRAM_PRIVATE_CHAT_ID);
-      const reporter = createReporter(TELEGRAM_TOKEN, TELEGRAM_PRIVATE_CHAT_ID);
+      const publicSender = createSender(TELEGRAM_PUBLIC_TOKEN, TELEGRAM_PUBLIC_CHAT_ID);
+      const privateSender = createSender(TELEGRAM_PRIVATE_TOKEN, TELEGRAM_PRIVATE_CHAT_ID);
 
-      core.startGroup('Config');
-      core.info(`Debug: ${String(config.debug)}`);
-      core.info(`Manual: ${String(config.manual)}`);
-      core.endGroup();
+      const runner = new AppRunner(config, scrapers, publicSender, privateSender);
+      await runner.run();
 
-      const runner = new AppRunner(config, scrapers, sender, reporter);
-      const commitScraperNames = await runner.run();
-
-      this.setCommitMessage(commitScraperNames);
+      this.setCommitMessage(runner.updatedScraperNames);
     }
     catch (error: unknown) {
       core.setFailed(error as Error);
@@ -58,11 +62,11 @@ export class App {
     return config;
   }
 
-  private setCommitMessage(commitScraperNames: string[]): void {
-    let commitMessage = 'Commit scrape results';
+  private setCommitMessage(scraperNames: string[]): void {
+    let commitMessage = 'Scraped';
 
-    if (commitScraperNames.length > 0) {
-      commitMessage += ': ' + commitScraperNames.join(', ');
+    if (scraperNames.length > 0) {
+      commitMessage += ': ' + scraperNames.join(', ');
     }
 
     core.setOutput('COMMIT_MESSAGE', commitMessage);

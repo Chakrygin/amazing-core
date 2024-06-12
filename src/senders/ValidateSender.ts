@@ -1,11 +1,11 @@
 import { Sender } from './Sender';
-import { Post, Link } from '../posts';
+import { Post } from '../models';
 
 export class ValidateSender implements Sender {
   constructor(
     private readonly sender: Sender) { }
 
-  async send(post: Post, debug: boolean): Promise<void> {
+  async send(post: Post): Promise<void> {
     const errors = [];
 
     if (post.image != undefined) {
@@ -13,7 +13,7 @@ export class ValidateSender implements Sender {
         errors.push('image is empty');
       }
       else if (!isValidUrl(post.image)) {
-        errors.push('image is not valid url');
+        errors.push(`image is not valid url: ${post.image}`);
       }
     }
 
@@ -25,7 +25,7 @@ export class ValidateSender implements Sender {
       errors.push('href is empty');
     }
     else if (!isValidUrl(post.href)) {
-      errors.push('href is not valid url');
+      errors.push(`href is not valid url: ${post.href}`);
     }
 
     if (post.categories.length > 0) {
@@ -40,7 +40,7 @@ export class ValidateSender implements Sender {
           errors.push(`category href at index ${index} is empty`);
         }
         else if (!isValidUrl(category.href)) {
-          errors.push(`category href at index ${index} is not valid url`);
+          errors.push(`category href at index ${index} is not valid url: ${category.href}`);
         }
       }
     }
@@ -54,8 +54,10 @@ export class ValidateSender implements Sender {
       }
     }
 
-    if (!post.date.isValid()) {
-      errors.push('date is not valid');
+    if (post.date) {
+      if (!post.date.isValid()) {
+        errors.push('date is not valid');
+      }
     }
 
     if (post.description) {
@@ -85,7 +87,7 @@ export class ValidateSender implements Sender {
           errors.push(`link href at index ${index} is empty`);
         }
         else if (!isValidUrl(link.href)) {
-          errors.push(`link href at index ${index} is not valid url`);
+          errors.push(`link href at index ${index} is not valid url: ${link.href}`);
         }
       }
     }
@@ -104,7 +106,7 @@ export class ValidateSender implements Sender {
       throw new Error('Post is not valid: ' + errors.join(', ') + '.');
     }
 
-    await this.sender.send(post, debug);
+    await this.sender.send(post);
   }
 }
 

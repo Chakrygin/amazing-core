@@ -1,19 +1,16 @@
 import { Sender } from './Sender';
-import { Post } from '../posts';
-
-const DEFAULT_THROTTLE_TIMEOUT = 5000;
+import { Post } from '../models';
 
 export class ThrottleSender implements Sender {
   constructor(
-    private readonly sender: Sender,
-    private readonly timeout: number = DEFAULT_THROTTLE_TIMEOUT) { }
+    private readonly sender: Sender) { }
 
   private delay = Promise.resolve();
 
-  async send(post: Post, debug: boolean): Promise<void> {
+  async send(post: Post): Promise<void> {
     await this.delay;
-    await this.sender.send(post, debug);
+    await this.sender.send(post);
 
-    this.delay = new Promise<void>(resolve => setTimeout(resolve, this.timeout));
+    this.delay = new Promise<void>(resolve => setTimeout(resolve, 5000));
   }
 }

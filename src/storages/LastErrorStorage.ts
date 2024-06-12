@@ -2,11 +2,7 @@ import fs from 'fs';
 import moment from 'moment';
 import path from 'path';
 
-export interface LastErrorInfo {
-  readonly timestamp: moment.Moment;
-  readonly message: string;
-  readonly counter: number;
-}
+import { LastErrorInfo } from './LastErrorInfo';
 
 export class LastErrorStorage {
   constructor(
@@ -76,11 +72,11 @@ export class LastErrorStorage {
         const dir = path.dirname(this.path);
         if (!fs.existsSync(dir)) {
           fs.mkdirSync(dir, {
-            recursive: true
+            recursive: true,
           });
         }
 
-        const entries = [...this.lastErrors]
+        const entries = Array.from(this.lastErrors)
           .map(([name, entry]) => [name, {
             timestamp: entry.timestamp.toISOString(),
             message: entry.message,

@@ -2,10 +2,7 @@ import fs from 'fs';
 import moment from 'moment';
 import path from 'path';
 
-export interface LastUpdateInfo {
-  readonly timestamp: moment.Moment;
-  readonly idle?: true;
-}
+import { LastUpdateInfo } from './LastUpdateInfo';
 
 export class LastUpdateStorage {
   constructor(
@@ -28,22 +25,6 @@ export class LastUpdateStorage {
     this.saveLastUpdates();
   }
 
-  setIdle(name: string): void {
-    const lastUpdates = this.getLastUpdates();
-    const lastUpdate = lastUpdates.get(name);
-
-    if (!lastUpdate) {
-      throw new Error('Last update does not exists.');
-    }
-
-    lastUpdates.set(name, {
-      timestamp: lastUpdate.timestamp,
-      idle: true,
-    });
-
-    this.saveLastUpdates();
-  }
-
   private getLastUpdates() {
     if (!this.lastUpdates) {
       this.lastUpdates = new Map();
@@ -59,7 +40,6 @@ export class LastUpdateStorage {
         for (const [name, entry] of entries) {
           const lastUpdate: LastUpdateInfo = {
             timestamp: moment(entry.timestamp),
-            idle: entry.idle,
           };
 
           this.lastUpdates.set(name, lastUpdate);
@@ -76,14 +56,13 @@ export class LastUpdateStorage {
         const dir = path.dirname(this.path);
         if (!fs.existsSync(dir)) {
           fs.mkdirSync(dir, {
-            recursive: true
+            recursive: true,
           });
         }
 
-        const entries = [...this.lastUpdates]
+        const entries = Array.from(this.lastUpdates)
           .map(([name, item]) => [name, {
             timestamp: item.timestamp.toISOString(),
-            idle: item.idle,
           }])
           .sort();
 

@@ -1,15 +1,9 @@
-import { Post } from '../posts';
+import { Sender } from '../senders';
+import { Storage } from '../storages';
 
 export interface Scraper {
   readonly name: string;
   readonly path: string;
-  readonly behaviour?: ScraperBehaviour;
 
-  scrape(): AsyncGenerator<Post>;
-}
-
-export enum ScraperBehaviour {
-  Unknown,
-  BreakIfPostExists,
-  ContinueIfPostExists,
+  scrape(sender: Sender, storage: Storage): Promise<void>;
 }
