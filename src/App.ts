@@ -30,17 +30,15 @@ export class App {
       // Setup default moment locale.
       moment.locale('en');
 
-      const TELEGRAM_PUBLIC_TOKEN = getInput('TELEGRAM_PUBLIC_TOKEN');
+      const TELEGRAM_TOKEN = getInput('TELEGRAM_TOKEN');
       const TELEGRAM_PUBLIC_CHAT_ID = getInput('TELEGRAM_PUBLIC_CHAT_ID');
-
-      const TELEGRAM_PRIVATE_TOKEN = getInput('TELEGRAM_PRIVATE_TOKEN');
       const TELEGRAM_PRIVATE_CHAT_ID = getInput('TELEGRAM_PRIVATE_CHAT_ID');
 
       const config = this.createConfig();
       const knownHosts = getKnownHosts(config.path);
       const scrapers = this.createScrapers(knownHosts);
-      const publicSender = createSender(TELEGRAM_PUBLIC_TOKEN, TELEGRAM_PUBLIC_CHAT_ID);
-      const privateSender = createSender(TELEGRAM_PRIVATE_TOKEN, TELEGRAM_PRIVATE_CHAT_ID);
+      const publicSender = createSender(TELEGRAM_TOKEN, TELEGRAM_PUBLIC_CHAT_ID);
+      const privateSender = createSender(TELEGRAM_TOKEN, TELEGRAM_PRIVATE_CHAT_ID);
 
       const runner = new AppRunner(config, scrapers, publicSender, privateSender);
       await runner.run();
