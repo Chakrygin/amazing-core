@@ -52,7 +52,8 @@ export class App {
 
   private createConfig(): AppConfig {
     const config: AppConfig = {
-      path: path.join(process.cwd(), 'data'),
+      // BUG: https://github.com/vercel/ncc/issues/1199
+      path: path.join(process.cwd(), 'data'.toString()),
       debug: github.context.ref !== 'refs/heads/main',
       manual: github.context.eventName !== 'schedule',
     };

@@ -39,19 +39,15 @@ export abstract class DevBlogsScraperBase extends ScraperBase {
           .map((_, element) => $(element).text())
           .toArray();
 
-        const result: Post = {
+        return {
           image,
           title,
           href,
-          categories: [
-            this.DevBlogs,
-            this.blog,
-          ],
+          categories: [this.DevBlogs, this.blog],
           date: moment(date, 'LL'),
           tags,
         };
 
-        return result;
       });
   }
 
@@ -60,12 +56,13 @@ export abstract class DevBlogsScraperBase extends ScraperBase {
       .fromHtmlPage(post.href)
       .enrichPost('#main .entry-content', ($, element) => {
 
-        const result: Post = {
+        const description = this.getDescription($, element);
+
+        return {
           ...post,
-          description: this.getDescription($, element),
+          description,
         };
 
-        return result;
       });
   }
 

@@ -22,7 +22,7 @@ export abstract class HabrScraperBase extends ScraperBase {
 
   readonly name = `Habr / ${this.title}`;
   readonly path = 'habr.com';
-  readonly href = `https://habr.com/ru/hub/${this.id}/`;
+  readonly href = `https://habr.com/ru/hubs/${this.id}/articles/`;
   readonly strategy = ScraperStrategy.ContinueIfPostExists;
 
   private readonly Habr: Link = {
@@ -33,9 +33,10 @@ export abstract class HabrScraperBase extends ScraperBase {
   protected override fetchPosts(): AsyncGenerator<Post> {
     return this
       .fromHtmlPage(this.href)
-      .fetchPosts('.tm-articles-list article.tm-articles-list__item', ($, element) => {
+      .fetchPosts('#app main .tm-articles-list article.tm-articles-list__item', ($, element) => {
 
-        const rating = parseInt(element.find('.tm-votes-meter__value').text());
+        const ratingText = element.find('.tm-votes-meter__value').text();
+        const rating = parseInt(ratingText);
 
         if (isNaN(rating)) {
           throw new Error('Failed to parse post. Rating is NaN.');
@@ -46,27 +47,24 @@ export abstract class HabrScraperBase extends ScraperBase {
           return;
         }
 
+        const image = this.getImage(element);
         const link = element.find('a.tm-title__link');
         const title = link.text();
         const href = link.attr('href') ?? '';
         const date = element.find('.tm-article-datetime-published time').attr('datetime') ?? '';
-
         const [categories, tags] = this.getCategoriesAndTags($, element);
+        const description = this.getDescription($, element);
 
-        const post: Post = {
-          image: this.getImage(element),
+        return {
+          image,
           title,
           href: this.getFullHref(href),
-          categories: [
-            this.Habr,
-            ...categories
-          ],
+          categories: [this.Habr, ...categories],
           date: moment(date).locale('ru'),
-          description: this.getDescription($, element),
+          description,
           tags,
         };
 
-        return post;
       });
   }
 
@@ -128,7 +126,7 @@ export abstract class HabrScraperBase extends ScraperBase {
 
       for (const child of children) {
         if (child.name == 'p') {
-          const p = $(element);
+          const p = $(child);
           const text = p.text().trim();
 
           if (text) {
