@@ -24,19 +24,19 @@ export class BreakIfPostExistsStrategy implements Strategy {
         break;
       }
 
+      const enrichedPost = await this.enrichPost(fetchedPost);
+
+      if (!enrichedPost) {
+        core.info('The post is not interesting. Continue scraping.');
+        continue;
+      }
+
       if (!firstPostDate) {
         firstPostDate = fetchedPost.date;
       }
       else if (firstPostDate.diff(fetchedPost.date, 'day') >= 1) {
         core.info('The post is too old. Break scraping.');
         break;
-      }
-
-      const enrichedPost = await this.enrichPost(fetchedPost);
-
-      if (!enrichedPost) {
-        core.info('The post is not interesting. Continue scraping.');
-        continue;
       }
 
       printPostJson(enrichedPost);
