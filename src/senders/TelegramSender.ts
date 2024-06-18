@@ -67,7 +67,7 @@ export class TelegramSender implements Sender {
   private getMessageInternal(post: Post): string {
     const lines: string[] = [];
 
-    lines.push(bold(post.title));
+    lines.push(bold(encode(post.title)));
 
     const line: string[] = [];
 
