@@ -3,7 +3,7 @@ import RssParser from 'rss-parser';
 import { Scraper } from './Scraper';
 import { ScraperStrategy } from './ScraperStrategy';
 
-import { HtmlPageHelper, RssFeedHelper } from './helpers';
+import { HtmlPageHelper, NuxtDataHelper, RssFeedHelper } from './helpers';
 import { BreakIfPostExistsStrategy, ContinueIfPostExistsStrategy, Strategy } from './strategies';
 
 import { Post } from '../models';
@@ -50,6 +50,10 @@ export abstract class ScraperBase implements Scraper {
 
   protected fromHtmlPage(url: string): HtmlPageHelper {
     return new HtmlPageHelper(url);
+  }
+
+  protected fromNuxtData(url: string) : NuxtDataHelper {
+    return new NuxtDataHelper(url);
   }
 
   protected fromRssFeed<TFeed, TItem>(url: string, options: RssParser.ParserOptions<TFeed, TItem> = {}): RssFeedHelper<TFeed, TItem> {
