@@ -28,14 +28,13 @@ export abstract class DevBlogsScraperBase extends ScraperBase {
       .fromHtmlPage(this.blog.href)
       .fetchPosts('main section div.masonry-container div.masonry-card', ($, element) => {
 
-        const thumbnail = element.find('div.masonry-thumbnail');
-        const image = thumbnail.find('>img').attr('src');
+        const image = element.find('div.masonry-thumbnail>img').attr('src');
         const header = element.find('h3');
         const link = header.find('>a');
         const title = link.text();
         const href = link.attr('href') ?? '';
-        const date = thumbnail
-          .next()
+        const date = header
+          .prev()
           .children()
           .children()
           .last()
