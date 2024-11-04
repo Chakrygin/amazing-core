@@ -28,7 +28,7 @@ export abstract class DevBlogsScraperBase extends ScraperBase {
       .fromHtmlPage(this.blog.href)
       .fetchPosts('main section div.masonry-container div.masonry-card', ($, element) => {
 
-        const image = element.find('div.masonry-thumbnail>img').attr('src');
+        const image = element.find('div.masonry-thumbnail>img').attr('data-src');
         const header = element.find('h3');
         const link = header.find('>a');
         const title = link.text();
@@ -36,13 +36,11 @@ export abstract class DevBlogsScraperBase extends ScraperBase {
         const date = header
           .prev()
           .children()
-          .children()
-          .last()
+          .first()
           .text();
 
-        const description = header
-          .next()
-          .find('p')
+        const description = element
+          .find('p.excerpt-body')
           .map((_, p) => $(p).text().trim())
           .filter((_, line) => !!line)
           .toArray();
