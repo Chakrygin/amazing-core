@@ -1,3 +1,4 @@
+import * as cheerio from 'cheerio';
 import moment from 'moment';
 
 import { ScraperBase } from '../ScraperBase';
@@ -39,21 +40,54 @@ export abstract class DevBlogsScraperBase extends ScraperBase {
           .first()
           .text();
 
-        const description = element
-          .find('p.excerpt-body')
-          .map((_, p) => $(p).text().trim())
-          .filter((_, line) => !!line)
-          .toArray();
-
         return {
           image,
           title,
           href,
           categories: [this.DevBlogs, this.blog],
           date: moment(date, 'LL'),
+        };
+
+      });
+  }
+
+  protected override enrichPost(post: Post): Promise<Post | undefined> {
+    return this
+      .fromHtmlPage(post.href)
+      .enrichPost('main article div.entry-content', ($, element) => {
+
+        const description = this.getDescription($, element);
+
+        return {
+          ...post,
           description,
         };
 
       });
+  }
+
+  private getDescription($: cheerio.CheerioAPI, element: cheerio.Cheerio<cheerio.Element>): string[] {
+    const description: string[] = [];
+    const children = element.children();
+
+    for (const child of children) {
+      if (child.name == 'p') {
+        const p = $(child);
+        const text = p.text().trim();
+
+        if (text) {
+          description.push(text);
+
+          if (description.length >= 5) {
+            break;
+          }
+        }
+      }
+      else if (description.length > 0) {
+        break;
+      }
+    }
+
+    return description;
   }
 }
