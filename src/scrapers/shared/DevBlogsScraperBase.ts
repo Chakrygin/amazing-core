@@ -72,8 +72,10 @@ export abstract class DevBlogsScraperBase extends ScraperBase {
 
     for (const child of children) {
       if (child.name == 'p') {
-        const p = $(child);
-        const text = p.text().trim();
+        const text = $(child)
+          .text()
+          .replace(/\s+/g, ' ')
+          .trim();
 
         if (text) {
           description.push(text);
