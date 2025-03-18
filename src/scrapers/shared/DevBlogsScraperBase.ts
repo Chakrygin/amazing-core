@@ -29,7 +29,7 @@ export abstract class DevBlogsScraperBase extends ScraperBase {
       .fromHtmlPage(this.blog.href)
       .fetchPosts('main section div.masonry-container div.masonry-card', ($, element) => {
 
-        const image = element.find('div.masonry-thumbnail>img').attr('data-src');
+        const image = this.getImage(element);
         const header = element.find('h3');
         const link = header.find('>a');
         const title = link.text();
@@ -64,6 +64,16 @@ export abstract class DevBlogsScraperBase extends ScraperBase {
         };
 
       });
+  }
+
+  private getImage(element: cheerio.Cheerio<cheerio.Element>): string | undefined {
+    const image = element
+      .find('div.masonry-thumbnail>img')
+      .attr('data-src');
+
+    if (image && !image.endsWith('.svg')) {
+      return image;
+    }
   }
 
   private getDescription($: cheerio.CheerioAPI, element: cheerio.Cheerio<cheerio.Element>): string[] {

@@ -6,10 +6,10 @@ export interface Post {
   readonly image?: string;
   readonly title: string;
   readonly href: string;
-  readonly categories: Link[];
+  readonly categories: readonly Link[];
   readonly author?: string;
   readonly date?: moment.Moment;
-  readonly description?: string[];
-  readonly links?: Link[];
-  readonly tags?: string[];
+  readonly description?: readonly string[];
+  readonly links?: readonly Link[];
+  readonly tags?: readonly string[];
 }
