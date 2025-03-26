@@ -30,7 +30,7 @@ export abstract class MaveScraperBase extends ScraperBase {
       .fromNuxtData(this.Mave.href)
       .fetchPosts<MaveData>((data) => {
         const podcast = data.data.fetchedPodcastData;
-        const episodes = data.data.fetchedEpisodesData;
+        const episodes = data.data.fetchedEpisodesData.episodes;
         return fetchPosts.call(this, podcast, episodes);
 
         function* fetchPosts(this: MaveScraperBase, podcast: MavePodcastData, episodes: MaveEpisodeData[]): Generator<Post> {
@@ -98,9 +98,14 @@ export abstract class MaveScraperBase extends ScraperBase {
 
 export interface MaveData {
   data: {
-    fetchedEpisodesData: MaveEpisodeData[],
+    fetchedEpisodesData: MaveEpisodesData,
     fetchedPodcastData: MavePodcastData,
   }
+}
+
+export interface MaveEpisodesData {
+  episodes: MaveEpisodeData[],
+  total: number,
 }
 
 export interface MaveEpisodeData {
