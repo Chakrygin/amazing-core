@@ -1,18 +1,27 @@
 import * as core from '@actions/core';
 
 import axios from 'axios';
+import https from 'https';
 
 import { Post } from '../../models';
 
 export class NuxtDataHelper {
 
   constructor(
-    private readonly url: string) { }
+    private readonly url: string,
+    private readonly trustCertificate: boolean) { }
 
   async * fetchPosts<T>(parse: (data: T) => Generator<Post>): AsyncGenerator<Post> {
     core.info(`Parsing html page by url ${this.url}...`);
 
-    const response = await axios.get(this.url);
+    const response = !this.trustCertificate
+      ? await axios.get(this.url)
+      : await axios.get(this.url, {
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false,
+        }),
+      });
+
     const html = response.data as string;
 
     const rawNuxtData = this.getRawNuxtData(html);

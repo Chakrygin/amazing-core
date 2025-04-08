@@ -4,6 +4,8 @@ import moment from 'moment';
 import { ScraperBase } from '../ScraperBase';
 import { Link, Post } from '../../models';
 
+const trustCertificate = true;
+
 export interface MaveScraperOptions {
   readonly name: string;
   readonly title: string;
@@ -27,7 +29,7 @@ export abstract class MaveScraperBase extends ScraperBase {
 
   protected fetchPosts(): AsyncGenerator<Post> {
     return this
-      .fromNuxtData(this.Mave.href)
+      .fromNuxtData(this.Mave.href, trustCertificate)
       .fetchPosts<MaveData>((data) => {
         const podcast = data.data.fetchedPodcastData;
         const episodes = data.data.fetchedEpisodesData.episodes;

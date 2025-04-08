@@ -52,8 +52,8 @@ export abstract class ScraperBase implements Scraper {
     return new HtmlPageHelper(url);
   }
 
-  protected fromNuxtData(url: string) : NuxtDataHelper {
-    return new NuxtDataHelper(url);
+  protected fromNuxtData(url: string, trustCertificate = false): NuxtDataHelper {
+    return new NuxtDataHelper(url, trustCertificate);
   }
 
   protected fromRssFeed<TFeed, TItem>(url: string, options: RssParser.ParserOptions<TFeed, TItem> = {}): RssFeedHelper<TFeed, TItem> {
