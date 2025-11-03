@@ -62,7 +62,8 @@ export abstract class MaveScraperBase extends ScraperBase {
     const $ = cheerio.load(episode.description);
     const result = $('body')
       .contents()
-      .map((_, node) => $(node).text())
+      .map((_, node) => $(node).text().trim())
+      .filter((_, line) => line.length > 0)
       .toArray();
 
     return result;
