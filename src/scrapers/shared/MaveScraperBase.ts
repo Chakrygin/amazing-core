@@ -9,6 +9,7 @@ const trustCertificate = true;
 export interface MaveScraperOptions {
   readonly name: string;
   readonly title: string;
+  readonly image: string;
   readonly storage: string;
 }
 
@@ -41,7 +42,7 @@ export abstract class MaveScraperBase extends ScraperBase {
             const links = this.getLinks(podcast, episode);
 
             yield {
-              image: `${this.options.storage}/${episode.image}`,
+              image: this.options.image, // `${this.options.storage}/${episode.image}`,
               title: `${episode.number} выпуск. ${episode.title}`,
               href: `${this.Mave.href}/ep-${episode.code}`,
               categories: [this.Mave],
