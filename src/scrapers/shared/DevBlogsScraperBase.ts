@@ -80,6 +80,10 @@ export abstract class DevBlogsScraperBase extends ScraperBase {
     const description: string[] = [];
     const children = element.children();
 
+    if (children.length == 1) {
+      return this.getDescription($, children.first());
+    }
+
     for (const child of children) {
       if (child.name == 'p') {
         const text = $(child)
